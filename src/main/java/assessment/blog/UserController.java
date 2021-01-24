@@ -71,6 +71,7 @@ class UserController {
         newuser.setEmail(form.email);
         newuser.setPassword(form.password);
         newuser.setRole("USER");
+        newuser.setEnabled(true);
         log.info("Attempting to register user: " + form.email);
         return userRepository.save(newuser);
     }
@@ -128,9 +129,11 @@ class UserController {
         {
             if (((UserDetails) principal).getUsername().equals(blogRepository.findById(id).get().getOwner()))
             {
+                log.info("Atempting blog deletion: " + id );
                 blogRepository.deleteById(id);
+                return;
             }
-            log.info("Unauthorized access to blog deletion: " + id);
+            log.info("Unauthorized access to blog deletion: " + id + " when owner was " + blogRepository.findById(id).get().getOwner());
             throw new ResponseStatusException(
                     HttpStatus.UNAUTHORIZED, "no such blog belongs to logged in user"
             );

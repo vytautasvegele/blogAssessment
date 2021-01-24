@@ -17,6 +17,7 @@ Vytautas Vėgėlė (vytautasveg@gmail.com)
 If no users are specified in any repositories, the following users will be populated
 * username: user1, password: p
 * username user2, password: p
+
 One can attempt to test functionality with cURL
 
 ### Register user
@@ -45,17 +46,24 @@ curl -i -b cookies.txt \
 -H "Accept: application/json" \
 -H "Content-Type:application/json" \
 -X POST --data \
-'{"title": "meme", "content": "big chungus"}' "http://localhost:8080/post"
+'{"title": "testpost", "content": "sample content text"}' "http://localhost:8080/post"
 ```
 
 ### Browse blog entries
 Review your blog entries
 ```
 curl -i -b cookies.txt \
+-H "Accept: application/json" \
 -X GET http://localhost:8080/blogs
 ```
 This, due to requirements, will only return the blog entries owned by your currently logged-in user.
 
+### Delete blog entry
+```
+curl -i -b cookies.txt \
+-H "Accept: application/json" \
+-X DELETE http://localhost:8080/blogs/4
+```
 
 # Used guides
 These are most of the data sources used in learning Spring and setting up this application:
