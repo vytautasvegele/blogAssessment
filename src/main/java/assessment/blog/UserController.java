@@ -5,6 +5,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -19,10 +20,9 @@ import org.springframework.web.server.ResponseStatusException;
 @RestController
 class UserController {
 
-    private final UserRepository userRepository;
-    private final BlogRepository blogRepository;
+    private  UserRepository userRepository;
+    private  BlogRepository blogRepository;
     private static final Logger log = LoggerFactory.getLogger(UserController.class);
-
 
     UserController(UserRepository repository, BlogRepository blogRepository)
 
@@ -45,11 +45,16 @@ class UserController {
 
     @GetMapping("/blogs")
     List<Blog> allBlogs() {
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (principal!=null)
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null)
         {
-            return blogRepository.getBlogsByOwner(((UserDetails)principal).getUsername());
+            Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            if (principal!=null)
+            {
+                return blogRepository.getBlogsByOwner(((UserDetails)principal).getUsername());
+            }
         }
+
         log.info("Unauthorized access to blogs");
         throw new ResponseStatusException(
                 HttpStatus.NOT_FOUND, "user was not logged in"
@@ -80,18 +85,21 @@ class UserController {
     @PostMapping("/blogs")
     Blog newBlogEntry(@RequestBody BlogForm form) {
 
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (principal!=null)
-        {
-            Blog newBlog = new Blog();
-            newBlog.setOwner(((UserDetails)principal).getUsername());
-            newBlog.setTitle(form.getTitle());
-            newBlog.setContent(form.getContent());
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null) {
+            Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            if (principal != null)
+            {
+                Blog newBlog = new Blog();
+                newBlog.setOwner(((UserDetails) principal).getUsername());
+                newBlog.setTitle(form.getTitle());
+                newBlog.setContent(form.getContent());
 
-            log.info("Attempting to create blog entry (user: "
-                    + ((UserDetails)principal).getUsername() + ";title:"
-                    + form.getTitle() + ")");
-            return blogRepository.save(newBlog);
+                log.info("Attempting to create blog entry (user: "
+                        + ((UserDetails) principal).getUsername() + ";title:"
+                        + form.getTitle() + ")");
+                return blogRepository.save(newBlog);
+            }
         }
         throw new ResponseStatusException(
                 HttpStatus.UNAUTHORIZED, "user was not logged in"
@@ -101,36 +109,34 @@ class UserController {
     @PutMapping("/blogs")
     Blog blogUpdate(@PathVariable Long id, @RequestBody BlogForm form) {
 
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
-        if (principal!=null)
-        {
-            Blog newBlog = blogRepository.findById(id).get();
-            if (newBlog != null)
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null) {
+            Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            if (principal != null)
             {
-                if (((UserDetails) principal).getUsername().equals(newBlog.getOwner()))
+                Blog newBlog = blogRepository.findById(id).get();
+                if (newBlog != null)
                 {
-                    newBlog.setTitle(form.getTitle());
-                    newBlog.setContent(form.getContent());
-                    log.info("Attempting to update blog entry (user: "
-                            + ((UserDetails)principal).getUsername() + ";title:"
-                            + form.getTitle() + ")");
-                    return blogRepository.save(newBlog);
+                    if (((UserDetails) principal).getUsername().equals(newBlog.getOwner()))
+                    {
+                        newBlog.setTitle(form.getTitle());
+                        newBlog.setContent(form.getContent());
+                        log.info("Attempting to update blog entry (user: "
+                                + ((UserDetails) principal).getUsername() + ";title:"
+                                + form.getTitle() + ")");
+                        return blogRepository.save(newBlog);
+                    } else {
+                        log.info("Unauthorized access to blog update: " + id);
+                        throw new ResponseStatusException(
+                                HttpStatus.UNAUTHORIZED, "no such blog belongs to logged in user"
+                        );
+                    }
                 }
-                else
-                {
-                    log.info("Unauthorized access to blog update: " + id);
-                    throw new ResponseStatusException(
-                            HttpStatus.UNAUTHORIZED, "no such blog belongs to logged in user"
-                    );
-                }
+                else //we could assume put is post for a new entry
+                    newBlogEntry(form);
             }
-            else //we could assume put is post for a new entry
-                newBlogEntry(form);
-
-
-
         }
+
         throw new ResponseStatusException(
                 HttpStatus.UNAUTHORIZED, "user was not logged in"
         );
@@ -147,19 +153,21 @@ class UserController {
 
     @DeleteMapping("/blogs/{id}")
     void deleteBlog(@PathVariable Long id) {
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (principal!=null)
-        {
-            if (((UserDetails) principal).getUsername().equals(blogRepository.findById(id).get().getOwner()))
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null) {
+            Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            if (principal != null)
             {
-                log.info("Atempting blog deletion: " + id );
-                blogRepository.deleteById(id);
-                return;
+                    if (((UserDetails) principal).getUsername().equals(blogRepository.findById(id).get().getOwner())) {
+                        log.info("Atempting blog deletion: " + id);
+                        blogRepository.deleteById(id);
+                        return;
+                    }
+                    log.info("Unauthorized access to blog deletion: " + id + " when owner was " + blogRepository.findById(id).get().getOwner());
+                    throw new ResponseStatusException(
+                            HttpStatus.UNAUTHORIZED, "no such blog belongs to logged in user"
+                    );
             }
-            log.info("Unauthorized access to blog deletion: " + id + " when owner was " + blogRepository.findById(id).get().getOwner());
-            throw new ResponseStatusException(
-                    HttpStatus.UNAUTHORIZED, "no such blog belongs to logged in user"
-            );
         }
         throw new ResponseStatusException(
                 HttpStatus.UNAUTHORIZED, "user was not logged in"
@@ -176,19 +184,20 @@ class UserController {
 
         return blogRepository.findById(id)
                 .map(blog -> {
-                    Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-                    if (principal!=null)
-                    {
-                        if (((UserDetails) principal).getUsername().equals(blog.getOwner()))
-                        {
-                            blog.setTitle(newBlog.getTitle());
-                            blog.setContent(newBlog.getContent());
-                            return blogRepository.save(blog);
+                    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+                    if (auth != null) {
+                        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+                        if (principal != null) {
+                                if (((UserDetails) principal).getUsername().equals(blog.getOwner())) {
+                                    blog.setTitle(newBlog.getTitle());
+                                    blog.setContent(newBlog.getContent());
+                                    return blogRepository.save(blog);
+                                }
+                                log.info("Unauthorized access to blog change: " + id);
+                                throw new ResponseStatusException(
+                                        HttpStatus.UNAUTHORIZED, "no such blog belongs to logged in user"
+                                );
                         }
-                        log.info("Unauthorized access to blog change: " + id);
-                        throw new ResponseStatusException(
-                                HttpStatus.UNAUTHORIZED, "no such blog belongs to logged in user"
-                        );
                     }
                     log.info("Unauthorized access to blog change: " + id);
                     throw new ResponseStatusException(
@@ -197,12 +206,16 @@ class UserController {
 
                 })
                 .orElseGet(() -> {
-                    Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-                    if (principal!=null)
-                    {
-                        newBlog.setId(id);
-                        newBlog.setOwner(((UserDetails) principal).getUsername());
-                        return blogRepository.save(newBlog);
+                    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+                    if (auth != null) {
+                        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+                        if (principal != null) {
+
+
+                            newBlog.setId(id);
+                            newBlog.setOwner(((UserDetails) principal).getUsername());
+                            return blogRepository.save(newBlog);
+                        }
                     }
                     log.info("Unauthorized access to blog " + id);
                     throw new ResponseStatusException(
