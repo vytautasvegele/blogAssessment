@@ -1,47 +1,66 @@
 # Getting Started
 
+This project is for a technical assessment made by 
+Vytautas Vėgėlė (vytautasveg@gmail.com)
+
 ## Requirements
+
+
 
 ## Startup
 
-## API testing
-If no users are specified in any repositories, the following users will be populated
-* username: bilbo, password: p
-* username frodo, password: p
 
+
+## API testing
+
+### Default data
+If no users are specified in any repositories, the following users will be populated
+* username: user1, password: p
+* username user2, password: p
 One can attempt to test functionality with cURL
 
+### Register user
 You can register a new user with
 ```
 curl -i \
 -H "Accept: application/json" \
 -H "Content-Type:application/json" \
--X POST --data 
+-X POST --data \
   '{"email": "test1", "password": "p"}' "http://localhost:8080/register"
 ```
 
+### Login user
 You can get a session started and saved to a file with
-```curl -i \
+```
+curl -i \
 -H "Content-type: application/x-www-form-urlencoded" \
 -c cookies.txt \
 -X POST http://localhost:8080/login -d "username=test1&password=p"
 ```
-Then use the same session to use the API
-`curl -i -b cookies.txt -X GET http://localhost:8080/blogs`
 
+### Create blog entry
+Then use the same session to use the API. Start with creating a blog entry
+```
+curl -i -b cookies.txt \
+-H "Accept: application/json" \
+-H "Content-Type:application/json" \
+-X POST --data \
+'{"title": "meme", "content": "big chungus"}' "http://localhost:8080/post"
+```
 
+### Browse blog entries
+Review your blog entries
+```
+curl -i -b cookies.txt \
+-X GET http://localhost:8080/blogs
+```
+This, due to requirements, will only return the blog entries owned by your currently logged-in user.
 
 
 # Used guides
-For further reference, please consider the following sections:
+These are most of the data sources used in learning Spring and setting up this application:
 
-* [Official Apache Maven documentation](https://maven.apache.org/guides/index.html)
-* [Spring Boot Maven Plugin Reference Guide](https://docs.spring.io/spring-boot/docs/2.4.2/maven-plugin/reference/html/)
-* [Create an OCI image](https://docs.spring.io/spring-boot/docs/2.4.2/maven-plugin/reference/html/#build-image)
 * [Spring Web](https://docs.spring.io/spring-boot/docs/2.4.2/reference/htmlsingle/#boot-features-developing-web-applications)
 * [Spring Data JPA](https://docs.spring.io/spring-boot/docs/2.4.2/reference/htmlsingle/#boot-features-jpa-and-spring-data)
-
 * [Building a RESTful Web Service](https://spring.io/guides/gs/rest-service/)
-* [Serving Web Content with Spring MVC](https://spring.io/guides/gs/serving-web-content/)
-* [Building REST services with Spring](https://spring.io/guides/tutorials/bookmarks/)
 * [Accessing Data with JPA](https://spring.io/guides/gs/accessing-data-jpa/)
