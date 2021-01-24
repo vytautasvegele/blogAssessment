@@ -74,7 +74,10 @@ public class User {
         this.enabled = enabled;
     }
 
-
+    @Override
+    public String toString() {
+        return "User{" + "id=" + this.id + ", email='" + this.email + '\'' + ", password=[protected] }";
+    }
     // getters and setters are not shown for brevity
 
 }

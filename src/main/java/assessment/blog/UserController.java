@@ -76,8 +76,9 @@ class UserController {
         return userRepository.save(newuser);
     }
 
-    @PostMapping("/post")
-    Blog newRegistration(@RequestBody BlogForm form) {
+
+    @PostMapping("/blogs")
+    Blog newBlogEntry(@RequestBody BlogForm form) {
 
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (principal!=null)
@@ -97,20 +98,42 @@ class UserController {
         );
     }
 
-
-    @PostMapping("/blogs")
-    Blog newBlog(@RequestBody Blog newBlog) {
+    @PutMapping("/blogs")
+    Blog blogUpdate(@PathVariable Long id, @RequestBody BlogForm form) {
 
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
         if (principal!=null)
         {
-            newBlog.setOwner(((UserDetails)principal).getUsername());
-            return blogRepository.save(newBlog);
+            Blog newBlog = blogRepository.findById(id).get();
+            if (newBlog != null)
+            {
+                if (((UserDetails) principal).getUsername().equals(newBlog.getOwner()))
+                {
+                    newBlog.setTitle(form.getTitle());
+                    newBlog.setContent(form.getContent());
+                    log.info("Attempting to update blog entry (user: "
+                            + ((UserDetails)principal).getUsername() + ";title:"
+                            + form.getTitle() + ")");
+                    return blogRepository.save(newBlog);
+                }
+                else
+                {
+                    log.info("Unauthorized access to blog update: " + id);
+                    throw new ResponseStatusException(
+                            HttpStatus.UNAUTHORIZED, "no such blog belongs to logged in user"
+                    );
+                }
+            }
+            else //we could assume put is post for a new entry
+                newBlogEntry(form);
+
+
+
         }
         throw new ResponseStatusException(
                 HttpStatus.UNAUTHORIZED, "user was not logged in"
         );
-
     }
 
     //DELETE methods-----------------------------

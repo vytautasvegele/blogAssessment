@@ -74,6 +74,7 @@ class Blog {
 
     @Override
     public String toString() {
-        return "Employee{" + "id=" + this.id + ", name='" + this.title + '\'' + ", role='" + this.content + '\'' + '}';
+        return "Blog{" + "id=" + this.id + ", title='" + this.title +
+                '\'' + ", content='" + this.content  + ", owner='" + this.owner + '\'' + '}';
     }
 }
