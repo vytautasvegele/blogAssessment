@@ -1,7 +1,7 @@
 # Getting Started
 
 This project is for a technical assessment made by 
-Vytautas Vėgėlė (vytautasveg@gmail.com)
+Vytautas Vėgėlė (vytautasveg at gmail dot com)
 
 ## Requirements
 
