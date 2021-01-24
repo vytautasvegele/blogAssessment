@@ -11,10 +11,25 @@ If no users are specified in any repositories, the following users will be popul
 
 One can attempt to test functionality with cURL
 
+You can register a new user with
+```
+curl -i \
+-H "Accept: application/json" \
+-H "Content-Type:application/json" \
+-X POST --data 
+  '{"email": "test1", "password": "p"}' "http://localhost:8080/register"
+```
+
 You can get a session started and saved to a file with
-`curl -i -H "Content-type: application/x-www-form-urlencoded" -c cookies.txt -X POST http://localhost:8080/login -d "username=bilbo&password=p"`
+```curl -i \
+-H "Content-type: application/x-www-form-urlencoded" \
+-c cookies.txt \
+-X POST http://localhost:8080/login -d "username=test1&password=p"
+```
 Then use the same session to use the API
-`curl -i -b cookies.txt -X GET http://localhost:8080/employees`
+`curl -i -b cookies.txt -X GET http://localhost:8080/blogs`
+
+
 
 
 # Used guides

@@ -13,7 +13,7 @@ public class BlogUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username)
             throws UsernameNotFoundException {
-        User user = userRepository.getUserByUsername(username);
+        User user = userRepository.getUserByEmail(username);
 
         if (user == null) {
             throw new UsernameNotFoundException("Could not find user");

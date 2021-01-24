@@ -11,40 +11,48 @@ import javax.persistence.Id;
 class Blog {
 
     private @Id @GeneratedValue Long id;
-    private String name;
-    private String role;
+    private String title;
+    private String content;
+    private String owner;
 
 
     Blog() {}
 
-    Blog(String name, String role) {
-
-        this.name = name;
-        this.role = role;
+    Blog(String name, String role, String owner) {
+        this.title = name;
+        this.content = role;
+        this.owner = owner;
     }
 
     public Long getId() {
         return this.id;
     }
 
-    public String getName() {
-        return this.name;
+    public String getTitle() {
+        return this.title;
     }
 
-    public String getRole() {
-        return this.role;
+    public String getContent() {
+        return this.content;
     }
 
     public void setId(Long id) {
         this.id = id;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setTitle(String title) {
+        this.title = title;
     }
 
-    public void setRole(String role) {
-        this.role = role;
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    public String getOwner() {
+        return owner;
+    }
+    public void setOwner(String owner) {
+        this.owner = owner;
     }
 
     @Override
@@ -55,17 +63,17 @@ class Blog {
         if (!(o instanceof Blog))
             return false;
         Blog employee = (Blog) o;
-        return Objects.equals(this.id, employee.id) && Objects.equals(this.name, employee.name)
-                && Objects.equals(this.role, employee.role);
+        return Objects.equals(this.id, employee.id) && Objects.equals(this.title, employee.title)
+                && Objects.equals(this.content, employee.content);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(this.id, this.name, this.role);
+        return Objects.hash(this.id, this.title, this.content);
     }
 
     @Override
     public String toString() {
-        return "Employee{" + "id=" + this.id + ", name='" + this.name + '\'' + ", role='" + this.role + '\'' + '}';
+        return "Employee{" + "id=" + this.id + ", name='" + this.title + '\'' + ", role='" + this.content + '\'' + '}';
     }
 }
