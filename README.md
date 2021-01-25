@@ -47,9 +47,16 @@ To run the unit tests for endpoints use
 # API usage (using cURL)
 
 ## Default data
-If no users are specified in any repositories, the following users will be populated
-* username: user1, password: p
-* username user2, password: p
+The JRA for users and blogs is pre-populated with the following entries
+
+Users:
+* username: user1@example.com, password: p
+* username: user2@example.com, password: p
+  
+Blog entries:
+* title: "Test", content: "Text1", owner: "user1@example.com"
+* title: "Test2", content: "Text2", owner: "user2@example.com"
+* title: "Test3", content: "Text3", owner: "user1@example.com"
 
 One can attempt to test functionality with cURL
 ##Step-by-step walktrough
@@ -60,7 +67,7 @@ curl -i \
 -H "Accept: application/json" \
 -H "Content-Type:application/json" \
 -X POST --data \
-  '{"email": "test1", "password": "p"}' "http://localhost:8080/register"
+  '{"email": "test1@example.com", "password": "p"}' "http://localhost:8080/register"
 ```
 
 ### Login user
@@ -69,7 +76,7 @@ You can get a session started and saved to a file with
 curl -i \
 -H "Content-type: application/x-www-form-urlencoded" \
 -c cookies.txt \
--X POST http://localhost:8080/login -d "username=test1&password=p"
+-X POST http://localhost:8080/login -d "username=test1@example.com&password=p"
 ```
 
 ### Create blog entry
@@ -116,8 +123,7 @@ curl -i -b cookies.txt \
   if we were to change H2 to some relational or other database to store the jpa repositories.
 * Enpoint unit testing: I had some troubles coding session storage for testing and opted-out from full testing, only leaving
 simple controller calls that are expected to fail due to those operations requiring a session.
-## Other 
-* The is no email validation currently in the project.
+## Other
 * The spring boot was configured for a development environment without consideration to a production environment.
 
 # Used guides

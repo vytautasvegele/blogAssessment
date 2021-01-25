@@ -15,8 +15,8 @@ class LoadData {
     CommandLineRunner initUserDatabase(UserRepository repository) {
 
         return args -> {
-            log.info("Preloading " + repository.save(new User("user1", "p", "USER", true)));
-            log.info("Preloading " + repository.save(new User("user2", "p", "USER", true)));
+            log.info("Preloading " + repository.save(new User("user1@example.com", "p", "USER", true)));
+            log.info("Preloading " + repository.save(new User("user2@example.com", "p", "USER", true)));
         };
     }
 
@@ -24,9 +24,9 @@ class LoadData {
     CommandLineRunner initBlogDatabase(BlogRepository repository) {
 
         return args -> {
-            log.info("Preloading " + repository.save(new Blog("Test", "Text1", "user1")));
-            log.info("Preloading " + repository.save(new Blog("Test2", "Text2", "user2")));
-            log.info("Preloading " + repository.save(new Blog("Test3", "Text3", "user1")));
+            log.info("Preloading " + repository.save(new Blog("Test", "Text1", "user1@example.com")));
+            log.info("Preloading " + repository.save(new Blog("Test2", "Text2", "user2@example.com")));
+            log.info("Preloading " + repository.save(new Blog("Test3", "Text3", "user1@example.com")));
         };
     }
 }

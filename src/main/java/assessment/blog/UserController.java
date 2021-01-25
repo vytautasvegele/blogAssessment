@@ -72,13 +72,28 @@ class UserController {
 
     @PostMapping("/register")
     User newRegistration(@RequestBody UserForm form) {
-        User newuser = new User();
-        newuser.setEmail(form.email);
-        newuser.setPassword(form.password);
-        newuser.setRole("USER");
-        newuser.setEnabled(true);
-        log.info("Attempting to register user: " + form.email);
-        return userRepository.save(newuser);
+        if (userRepository.getUserByEmail(form.getEmail()) == null)
+        {
+            String regex = "^[\\w-_\\.+]*[\\w-_\\.]\\@([\\w]+\\.)+[\\w]+[\\w]$";
+            if (form.getEmail().matches(regex))
+            {
+                User newuser = new User();
+                newuser.setEmail(form.email);
+                newuser.setPassword(form.password);
+                newuser.setRole("USER");
+                newuser.setEnabled(true);
+                log.info("Attempting to register user: " + form.email);
+                return userRepository.save(newuser);
+            }
+            else
+            {
+                throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "email format is wrong");
+            }
+
+        }
+        throw new ResponseStatusException(HttpStatus.CONFLICT, "email already taken");
+
+
     }
 
 
