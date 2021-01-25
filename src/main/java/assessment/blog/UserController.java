@@ -45,6 +45,7 @@ class UserController {
 
     @GetMapping("/blogs")
     List<Blog> allBlogs() {
+        log.info("Received get request for blogs");
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth != null)
         {
@@ -72,6 +73,7 @@ class UserController {
 
     @PostMapping("/register")
     User newRegistration(@RequestBody UserForm form) {
+        log.info("Received post request for registration");
         if (userRepository.getUserByEmail(form.getEmail()) == null)
         {
             String regex = "^[\\w-_\\.+]*[\\w-_\\.]\\@([\\w]+\\.)+[\\w]+[\\w]$";
@@ -99,7 +101,7 @@ class UserController {
 
     @PostMapping("/blogs")
     Blog newBlogEntry(@RequestBody BlogForm form) {
-
+        log.info("Received post request for blog entry posting");
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth != null) {
             Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -123,7 +125,7 @@ class UserController {
 
     @PutMapping("/blogs")
     Blog blogUpdate(@PathVariable Long id, @RequestBody BlogForm form) {
-
+        log.info("Received put request for blog entry editing");
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth != null) {
             Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -161,6 +163,7 @@ class UserController {
 
     @DeleteMapping("/users/{id}")
     void deleteUser(@PathVariable Long id) {
+        log.warn("Attempted to delete a user (NOT IMPLEMENTED");
         throw new ResponseStatusException(
                 HttpStatus.NOT_IMPLEMENTED, "not implemented"
         );
@@ -168,6 +171,7 @@ class UserController {
 
     @DeleteMapping("/blogs/{id}")
     void deleteBlog(@PathVariable Long id) {
+        log.info("Received delete request for blog entry removal");
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth != null) {
             Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
