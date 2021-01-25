@@ -44,6 +44,15 @@ To run the unit tests for endpoints use
 
 `mvn test -e`
 
+The made JUnit tests will use Rest-Assured  and do the following actions:
+* Register a new user with a valid email
+* Register a new user with an invalid email 
+* Login as an existing user and request all blogs
+* Login as an existing user and request all blogs
+* Login as an existing user, create a new blog, and delete an older one
+
+The tests do not cover all possible usages, but Spring REST is rather hard to test when session information is required.
+
 # API usage (using cURL)
 
 ## Default data
@@ -119,12 +128,13 @@ curl -i -b cookies.txt \
 
 # Missing goals
 ## Optional
-* Database versioning system: currently the project uses H2 in-memory storage, otherwise it would be more useful,
-  if we were to change H2 to some relational or other database to store the jpa repositories.
-* Enpoint unit testing: I had some troubles coding session storage for testing and opted-out from full testing, only leaving
-simple controller calls that are expected to fail due to those operations requiring a session.
-## Other
-* The spring boot was configured for a development environment without consideration to a production environment.
+* Database versioning system: currently the project uses H2 in-memory storage and this was not a huge priority.
+* Enpoint unit testing: just keeping a session was a challenge (which was ultimate solved with REST-Assured),
+  however tests can be expanded with more time.
+* Changing the database: this should be fairly feasible due to JPA and Hibernate, but it was not attempted here.  
+## Other notes
+* The spring boot was configured for a development environment without consideration for production environments.
+* Testing Spring will result in ports being randomized. Tests are able to read this port and us it later.
 
 # Used guides
 These are most of the data sources used in learning Spring and setting up this application:
@@ -134,3 +144,4 @@ These are most of the data sources used in learning Spring and setting up this a
 * [Building a RESTful Web Service](https://spring.io/guides/gs/rest-service/)
 * [Accessing Data with JPA](https://spring.io/guides/gs/accessing-data-jpa/)
 * [Accessing Session Login data](https://dzone.com/articles/how-to-get-current-logged-in-username-in-spring-se)
+* [Rest-assured filter for keeping session information](https://github.com/rest-assured/rest-assured/wiki/Usage#session-filter)
